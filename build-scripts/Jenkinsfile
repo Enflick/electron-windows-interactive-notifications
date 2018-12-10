@@ -1,0 +1,61 @@
+pipeline {
+    agent {
+        docker {
+            label 'docker-build'
+            image 'registry.enflick.com:5000/web:alpine-build'
+            args '-u root -e CI=true -e TZ=America/Toronto -e NPM_TOKEN=${env.NPM_TOKEN} -e BUILD_NUMBER=${env.BUILD_NUMBER} -e GIT_BRANCH=${env.GIT_BRANCH}'
+        }
+    }
+    options {
+        ansiColor('xterm')
+    }
+    stages {
+        stage('checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [
+                        [ name: 'master']
+                    ],
+                    browser: [
+                        $class: 'GithubWeb',
+                        repoUrl: 'https://github.com/Enflick/electron-windows-interactive-notifications'
+                    ],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [
+                        [ credentialsId: '94097088-a297-482c-8f6b-cc0c127ff7a3', url: 'git@github.com:Enflick/electron-windows-interactive-notifications.git']
+                    ]
+                ])
+            }
+        }
+
+        stage('publish') {
+            steps {
+                sh '''
+                    NPM_REGISTRY="https://npm.textnow.com"
+                    NPM_REGISTRY_DOMAIN="npm.textnow.com"
+
+                    # remove all .npmrc files before running publish
+                    find . -name '.npmrc' -delete
+
+                    echo "registry=$NPM_REGISTRY" > ~/.npmrc
+                    echo "//$NPM_REGISTRY_DOMAIN/:_authToken=\"$NPM_TOKEN\"" >> ~/.npmrc
+
+                    echo "Installing node modules..."
+                    npm install
+
+                    echo "Building dist..."
+                    npm run build
+
+                    echo "Next version: $NEXT_VERSION"
+                    npm version --no-git-tag-version patch
+
+                    echo "Publishing package using user $NPM_USER..."
+                    npm publish
+                '''
+            }
+        }
+    }
+}
