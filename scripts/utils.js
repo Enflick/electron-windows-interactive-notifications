@@ -15,7 +15,8 @@ function replaceSync (file, find, replace) {
 
 function getAppPackage () {
   const cwd = process.cwd()
-  const ends = cwd.indexOf('node_modules\\.staging')
+  // https://github.com/felixrieseberg/electron-windows-interactive-notifications/issues/6
+  const ends = cwd.indexOf('node_modules\\electron-windows-interactive-notifications')
   let package = null
 
   if (ends > 0) {
