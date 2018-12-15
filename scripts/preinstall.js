@@ -12,6 +12,7 @@ const { getConfiguration, setConfiguration } = require('./utils')
 
 getConfiguration()
   .then((configuration) => {
+    console.log('preinstall Getting configuration:', configuration);
     if (configuration) return;
 
     const guid = require('./replaceguid')()

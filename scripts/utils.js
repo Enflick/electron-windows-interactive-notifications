@@ -33,12 +33,16 @@ function getAppPackage () {
     }
   }
 
+  console.log('get app package:', package);
+
   return package
 }
 
 function getConfiguration() {
   return new Promise((resolve) => {
     fs.readFile(CONFIG_FILE, { encoding: 'utf-8' }, (err, result) => {
+      console.log('getConfiguration err', err);
+      console.log('getConfiguration results', err);
       if (err || !result) {
         resolve(false)
       }
