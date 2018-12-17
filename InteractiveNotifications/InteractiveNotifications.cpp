@@ -89,14 +89,6 @@ public:
     std::string toastArgs(wToastArgs.begin(), wToastArgs.end());
     std::string escapedToastArgs = "";
 
-    for (char ch : toastArgs) {
-      switch (ch) {
-        case ' ': escapedToastArgs += "%20"; break;
-        case '"': escapedToastArgs += "%22"; break;
-        default: escapedToastArgs += ch; break;
-      }
-    }
-
     std::string cmd = escapedToastArgs + "&userData=[{" + args + "}]";
 
     // Append protocol if not already present
